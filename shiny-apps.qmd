@@ -1,0 +1,44 @@
+---
+title: "Building Interactive Web Apps with Shiny"
+output: html
+editor: visual
+---
+
+## 🚀 What is Shiny?
+
+**Shiny** is an R package that allows you to build interactive web applications directly from R. With Shiny, you can create apps that allow users to interact with data and visualizations in real time.
+
+You don't need to know JavaScript or other web technologies—just R! Shiny handles the web part for you, so you can focus on your data and logic.
+
+------------------------------------------------------------------------
+
+## 🛠️ How Shiny Works
+
+A Shiny app has two main components:
+
+1.  **User Interface (UI)** – This is what the user sees and interacts with. It includes buttons, sliders, charts, tables, etc.
+2.  **Server** – This is where the R code runs. It processes the user’s inputs (like clicking a button or changing a slider) and updates the UI accordingly.
+
+### How It’s Structured
+
+-   **UI**: You design the layout and elements (like inputs and outputs).
+-   **Server**: You write the code that reacts to user inputs and updates the UI accordingly.
+
+Basic structure of a Shiny app:
+
+```{r}
+ library(shiny)
+
+# Define UI
+
+ui <- fluidPage( sliderInput("num", "Choose a number", 1, 100, 50), plotOutput("plot") )
+
+# Define server logic
+
+server <- function(input, output) { output$plot <- renderPlot({
+    hist(rnorm(input$num)) }) }
+
+# Run the app
+
+shinyApp(ui = ui, server = server)
+```

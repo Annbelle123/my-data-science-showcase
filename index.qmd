@@ -1,0 +1,51 @@
+---
+format: html
+editor: visual
+---
+
+## 👋 Hi, I'm Annabelle Petherbridge.
+
+[![](Annabelle-Photo.jpg){style="border-radius: 50%;" width="150"}](Annabelle-Photo.jpg)
+
+# 🎓 Education
+
+I have an undergraduate degree in Finance with a minor in Economics from the University of Oregon. In May of 2025, I will also have an MBA from Cal Poly Pomona.
+
+------------------------------------------------------------------------
+
+# Skills
+
+-   **Financial Analysis & Reporting**: Expertise in P&L analysis, forecasting, and cost optimization.
+
+-   **Microsoft Excel**: Advanced skills in data analysis, financial modeling, and reporting.
+
+-   **Collaborative Problem Solving**: Strong ability to work with teams to identify financial opportunities and solutions.
+
+    ------------------------------------------------------------------------
+
+# Career Aspirations
+
+## 💼 Current Role
+
+**Title:** Senior Financial Analyst – Supply Chain Finance
+
+My responsibilities include:
+
+-   📊 Forecasting & financial planning\
+-   📈 P&L creation and distribution\
+-   📋 Miscellaneous financial reporting\
+-   🤝 General field support
+
+------------------------------------------------------------------------
+
+## 🎯 Short-Term Goals
+
+In the near future, I aspire to step into a **managerial role**. I enjoy working in Supply Chain Finance and aim to continue developing within this area.
+
+------------------------------------------------------------------------
+
+## 🌟 Long-Term Aspirations
+
+My ultimate career goal is to become a **Chief Financial Officer (CFO)**. I’m passionate about leadership, strategic decision-making, and driving value through finance.
+
+------------------------------------------------------------------------

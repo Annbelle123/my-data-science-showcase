@@ -1,0 +1,280 @@
+---
+title: "Sales Dashboard"
+author: "Annabelle Petherbridge"
+format:
+  html:
+    theme: sketchy
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    version: 4
+editor: visual
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+# Load Libraries
+library(janitor) 
+library(tidyverse) 
+library(lubridate)
+
+# Load Data
+data <- read.csv("_site/train.csv")
+
+# clean column names using janitor
+data <- clean_names(data)
+
+# Convert dates to Date format
+data$order_date <- as.Date(data$order_date, format = "%d/%m/%Y")
+data$ship_date <- as.Date(data$ship_date, format = "%d/%m/%Y")
+
+# Calculate summary stats
+total_sales <- sum(data$sales, na.rm = TRUE)
+num_orders <- n_distinct(data$order_id)
+avg_sales_per_order <- round(mean(data$sales, na.rm = TRUE), 2)
+
+# Format total sales using scales package
+formatted_total_sales <- scales::dollar(total_sales)
+
+# Comma-separated number of orders
+formatted_num_orders <- scales::comma(num_orders)
+
+ # Dollar sign for avg sales
+formatted_avg_sales_per_order <- scales::dollar(avg_sales_per_order) 
+```
+
+<!-- CSS for card layout -->
+
+```{=html}
+<style>
+  .card-container {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    flex-wrap: wrap;
+    width: 100%; /* Ensure the container takes up full width */
+  }
+
+  .card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 8px;
+    width: 45%; /* Default width for cards */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+
+  /* Larger cards for specific sections like Sales Over Time and Top 3 Sales Months */
+  .card.sales-time {
+    width: 100% !important;  /* Ensure this card takes full width */
+    min-height: 500px;  /* Increase height to accommodate the graph */
+    padding: 20px;
+    margin-bottom: 40px; /* Extra space for large cards */
+  }
+
+  .card.top-sales {
+    width: 100% !important; /* Keep this card full width if needed */
+    min-height: 400px;
+    padding: 20px;
+  }
+  
+  .card.product-segment {
+  width: 100% !important;
+  min-height: 400px;
+  padding: 20px;
+  margin-bottom: 40px;
+}
+
+  @media (min-width: 768px) {
+    .card {
+      width: 30%; /* 3 cards in a row for larger screens */
+    }
+
+    /* Keep the larger cards at 100% width for wide plots/tables */
+    .card.sales-time {
+      width: 100% !important;  /* Full width for Sales Over Time on larger screens */
+    }
+
+    .card.top-sales {
+      width: 48%; /* Slightly larger for top-sales */
+    }
+  }
+
+  @media (max-width: 600px) {
+    .card {
+      width: 100%; /* Stack vertically on mobile */
+    }
+
+    .card.sales-time {
+      width: 100% !important;  /* Ensure full width on mobile */
+      min-height: 300px;  /* Adjust for smaller screens */
+    }
+  }
+</style>
+```
+# 🛒 About the Dataset
+
+This dashboard is built using a sales dataset from Kaggle that captures **four years of transactions** from a global superstore. Each row represents a unique order, with details spanning **customer segments**, **order and shipping dates**, **shipping methods**, **product categories**, and **sales revenue**.
+
+The dataset enables analysis of key business insights including:
+
+-   **Sales trends over time**
+
+-   **Product and category profitability**
+
+-   **Customer behavior by segment**
+
+## 📊 Summary Stats
+
+::: card-container
+::: card
+<h5 class="card-title">
+
+💰 Total Sales
+
+</h5>
+
+<p class="card-text">
+
+`r formatted_total_sales`
+
+</p>
+:::
+
+::: card
+<h5 class="card-title">
+
+📦 Number of Orders
+
+</h5>
+
+<p class="card-text">
+
+`r formatted_num_orders`
+
+</p>
+:::
+
+::: card
+<h5 class="card-title">
+
+🧮 Avg Sales / Order
+
+</h5>
+
+<p class="card-text">
+
+`r formatted_avg_sales_per_order`
+
+</p>
+:::
+:::
+
+## 🔝 Top 3 Sales Months
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+# Add month name and year
+data <- data %>%
+  mutate(
+    year = year(order_date),
+    month_num = month(order_date),
+    month_name = month.name[month_num]
+  )
+
+# Step 1: Get total sales per calendar month per year
+monthly_totals <- data %>%
+  group_by(year, month_num, month_name) %>%
+  summarise(monthly_sales = sum(sales, na.rm = TRUE), .groups = "drop")
+
+# Step 2: Calculate average monthly sales across years per month
+avg_month_sales <- monthly_totals %>%
+  group_by(month_name, month_num) %>%
+  summarise(avg_sales = mean(monthly_sales), .groups = "drop") %>%
+  arrange(desc(avg_sales)) %>%
+  slice_head(n = 3)
+
+# Format the sales for display
+avg_month_sales$avg_sales <- scales::dollar(round(avg_month_sales$avg_sales, 2))
+
+# Store the top 3 months and their sales for later use
+top_months <- avg_month_sales %>%
+  select(month_name, avg_sales) %>%
+  mutate(html = paste0("<strong>", month_name, "</strong>: ", avg_sales))
+```
+
+::: card
+<h5 class="card-title">
+
+🏆 Top 3 Sales Months (Avg Across 4 Yrs)
+
+</h5>
+
+<p class="card-text">
+
+`r paste(top_months$html, collapse = "<br>")`
+
+</p>
+:::
+
+## 📅 Sales Over Time
+
+This chart shows total sales over time, aggregated by month
+
+::: {.card .sales-time}
+<h5 class="card-title">
+
+Sales Over Time
+
+</h5>
+
+```{r sales-time, echo=FALSE, warning=FALSE, message=FALSE, fig.height=6, fig.width=10, fig.show='hold'}
+
+# Data transformation
+monthly_sales <- data %>% 
+  mutate(month = floor_date(order_date, "month")) %>% 
+  group_by(month) %>% 
+  summarise(total_sales = sum(sales, na.rm = TRUE))
+
+# Plotting the sales over time 
+ggplot(monthly_sales, aes(x = month, y = total_sales)) + 
+  geom_line(color = "#2C3E50", linewidth = 1.2) + 
+  labs(x = "Month", y = "Sales ($)") + theme_minimal()
+```
+:::
+
+## 📊 Sales by Product Segment
+
+This section will display a bar plot showing total sales for each product segment.
+
+<div class="card product-segment">
+
+<h5 class="card-title"> Sales by Product Segment</h5>
+
+```{r, , echo=FALSE, warning=FALSE, messsage=FALSE}
+
+# Summarize total sales by product segment
+segment_sales <- data %>%
+  group_by(segment) %>%
+  summarise(total_sales = sum(sales, na.rm = TRUE)) %>%
+  arrange(desc(total_sales))
+
+# Create a bar plot
+ggplot(segment_sales, aes(x = reorder(segment, total_sales), y = total_sales, fill = segment)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Total Sales by Product Segment",
+    x = "Product Segment",
+    y = "Total Sales ($)",
+    fill = "Segment"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+</div>
+
+## 📎 Appendix
+
+This dashboard was created using data from a public Kaggle dataset: [Sales Dataset on Kaggle](https://www.kaggle.com/)
