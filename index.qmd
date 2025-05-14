@@ -1,0 +1,25 @@
+---
+title: "Hi, I'm Annabelle"
+---
+
+::: columns
+::: {.column width="30%"}
+![](_site/1681828304114.jpg){style="border-radius: 50%;"}
+:::
+
+::: {.column width="70%" style="padding-left: 3rem;"}
+I'm a Financial analyst. I specialize in transforming complex information into clear, engaging, and actionable insights.
+:::
+:::
+
+## About Me
+
+I hold a bachelor's degree from University of Oregon.
+
+## Let's Connect
+
+You can [email me](mailto:Annabelleelizabethh@gmail.com) or connect on [LinkedIn](www.linkedin.com/in/annabelle-p-736040190).
+
+------------------------------------------------------------------------
+
+*Welcome to my portfolio.*
